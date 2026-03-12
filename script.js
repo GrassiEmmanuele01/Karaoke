@@ -69,6 +69,29 @@ function updateSpinBtn() {
   document.getElementById('spinBtn').disabled = availableParts.length === 0 || !songs.length;
 }
 
+// RESET TUTTO - SEMPRE DISPONIBILE
+document.getElementById('resetBtn').onclick = () => {
+  if (confirm('Sei sicuro di voler resettare tutto? Tutti i cantanti e le canzoni saranno di nuovo disponibili.')) {
+    usedParticipants = [];
+    usedSongs = [];
+    currentParticipant = null;
+    currentSongs = [];
+    
+    renderParticipants();
+    updateWheel();
+    updateStats();
+    updateSpinBtn();
+    
+    // Nascondi sezione carte se visibile
+    const cardsSection = document.getElementById('cardsSection');
+    cardsSection.classList.remove('showing');
+    document.getElementById('proposeMoreBtn').style.display = 'none';
+    document.getElementById('currentPlayer').textContent = '';
+    
+    alert('✅ Tutto resettato! Si ricomincia da capo! 🎉');
+  }
+};
+
 // Aggiorna ruota
 function updateWheel() {
   const svg = document.getElementById('wheelSvg');
@@ -94,7 +117,7 @@ function updateWheel() {
     text.setAttribute('dominant-baseline', 'middle');
     text.setAttribute('font-size', '14');
     text.setAttribute('fill', '#999');
-    text.textContent = participants.length ? 'Tutti hanno cantato!' : 'Aggiungi partecipanti';
+    text.textContent = participants.length ? 'Tutti hanno cantato! Clicca Reset per ricominciare.' : 'Aggiungi partecipanti';
     svg.appendChild(text);
     return;
   }

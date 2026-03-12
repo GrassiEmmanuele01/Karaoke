@@ -88,6 +88,14 @@ h1 {
   background: #6c5ce7;
 }
 
+.btn-reset {
+  background: #ff6b6b;
+}
+
+.btn-reset:hover {
+  background: #ee5a5a;
+}
+
 /* LISTA PARTECIPANTI */
 .participants-tags {
   display: flex;
@@ -319,4 +327,13 @@ h1 {
   }
   #wheelSvg { width: 300px; height: 300px; }
   .stats { gap: 20px; }
+  .input-group {
+    flex-direction: column;
+  }
+  #nameInput {
+    width: 100%;
+  }
+  .wheel-container .btn {
+    margin: 5px;
+  }
 }
