@@ -139,7 +139,7 @@ function updateSpinBtn() {
 
 // ==================== RESET ====================
 document.getElementById('resetBtn').onclick = () => {
-  if (confirm('Sei sicuro di voler resettare tutto? Tutti i cantanti e le canzoni saranno di nuovo disponibili.')) {
+  if (confirm('Sei sicuro di voler resettare tutto?')) {
     usedParticipants = [];
     usedSongs = [];
     currentParticipant = [];
@@ -156,7 +156,7 @@ document.getElementById('resetBtn').onclick = () => {
     
     hideAllCardSections();
     
-    alert('✅ Tutto resettato! Si ricomincia da capo! 🎉');
+    alert('✅ Tutto resettato! 🎉');
   }
 };
 
@@ -197,7 +197,7 @@ function updateWheel() {
     text.setAttribute('dominant-baseline', 'middle');
     text.setAttribute('font-size', '14');
     text.setAttribute('fill', '#999');
-    text.textContent = participants.length ? 'Tutti hanno cantato! Clicca Reset per ricominciare.' : 'Aggiungi partecipanti';
+    text.textContent = participants.length ? 'Tutti hanno cantato! Clicca Reset.' : 'Aggiungi partecipanti';
     svg.appendChild(text);
     return;
   }
@@ -304,21 +304,17 @@ document.getElementById('spinBtn').onclick = () => {
 
 // ==================== SHOW CARD MODE SELECTION ====================
 document.getElementById('showSongsBtn').onclick = () => {
-  // Check if there are available songs
   const availableCount = songs.filter(s => !usedSongs.includes(s)).length;
   if (availableCount === 0) {
-    alert('⚠️ Tutte le canzoni sono state già utilizzate! Clicca Reset per ricominciare.');
+    alert('⚠️ Tutte le canzoni sono state utilizzate! Reset per ricominciare.');
     return;
   }
   
-  // Hide all card sections first
   hideAllCardSections();
   
-  // Show the mode selection screen
   document.getElementById('cardModePlayer').textContent = `${currentParticipant} - Scegli la tua canzone`;
   document.getElementById('cardModeSelection').classList.add('showing');
   
-  // Scroll to selection
   setTimeout(() => {
     document.getElementById('cardModeSelection').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 300);
@@ -326,7 +322,6 @@ document.getElementById('showSongsBtn').onclick = () => {
 
 // ==================== SELECT CARD MODE ====================
 function selectCardMode(mode) {
-  // Hide mode selection
   document.getElementById('cardModeSelection').classList.remove('showing');
   
   if (mode === 'single') {
@@ -336,7 +331,6 @@ function selectCardMode(mode) {
   }
 }
 
-// Back to mode selection
 function backToModeSelection() {
   document.getElementById('singleCardSection').classList.remove('showing');
   document.getElementById('fiveCardsSection').classList.remove('showing');
@@ -348,7 +342,7 @@ function showSingleCardMode() {
   availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
   
   if (availableSongsForTurn.length === 0) {
-    alert('⚠️ Tutte le canzoni sono state già utilizzate! Clicca Reset per ricominciare.');
+    alert('⚠️ Tutte le canzoni sono state utilizzate!');
     backToModeSelection();
     return;
   }
@@ -483,7 +477,7 @@ function selectSong(songName) {
   }
   
   navigator.clipboard.writeText(songName).then(() => {
-    alert(`"${songName}" copiato!\n${currentParticipant} canterà questa canzone\n\n⚠️ Questa canzone non sarà più disponibile per gli altri cantanti!`);
+    alert(`"${songName}" copiato!\n${currentParticipant} canterà questa canzone`);
   });
   
   renderParticipants();

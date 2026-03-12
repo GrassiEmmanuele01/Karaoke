@@ -63,10 +63,10 @@ h3 {
 
 .mode-btn {
   flex: 1;
-  padding: 12px 20px;
+  padding: 10px 20px;
   font-size: 14px;
   border: 2px solid #ddd;
-  border-radius: 6px;
+  border-radius: 4px;
   background: white;
   color: #666;
   cursor: pointer;
@@ -99,13 +99,11 @@ h3 {
 
 .btn:hover {
   background: #5568d3;
-  transform: translateY(-1px);
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
 }
 
 .btn-success {
@@ -234,7 +232,7 @@ h3 {
 /* CARD SECTIONS */
 .cards-section {
   background: white;
-  padding: 40px 20px;
+  padding: 30px 20px;
   border-radius: 8px;
   margin-top: 20px;
   display: none;
@@ -247,68 +245,24 @@ h3 {
 }
 
 .cards-title {
-  font-size: 20px;
+  font-size: 18px;
   color: #333;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   text-align: center;
   font-weight: 400;
 }
 
-/* CARD MODE SELECTION */
-.card-mode-choices {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.mode-choice-btn {
-  background: white;
-  border: 3px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 40px 50px;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  min-width: 200px;
-}
-
-.mode-choice-btn:hover {
-  border-color: #667eea;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-}
-
-.mode-choice-icon {
-  font-size: 48px;
-}
-
-.mode-choice-text {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-}
-
-.mode-choice-desc {
-  font-size: 14px;
-  color: #999;
-}
-
-/* SINGLE CARD */
+/* SINGLE CARD - MINIMAL */
 .single-card-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 300px;
+  min-height: 280px;
 }
 
 .card {
-  width: 300px;
-  height: 350px;
+  width: 280px;
+  height: 320px;
   perspective: 1000px;
   cursor: pointer;
 }
@@ -330,7 +284,7 @@ h3 {
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 12px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -339,55 +293,58 @@ h3 {
   border: 2px solid #e0e0e0;
 }
 
+/* Fronte carta - colore solido */
 .card-front {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #667eea;
   color: white;
-  font-size: 48px;
+  font-size: 42px;
 }
 
+/* Retro carta - colore solido */
 .card-back {
-  background: linear-gradient(135deg, #f093fb, #f5576c);
+  background: #f093fb;
   color: white;
   transform: rotateY(180deg);
-  font-size: 20px;
+  font-size: 18px;
   text-align: center;
   line-height: 1.4;
 }
 
 .card.selected {
-  box-shadow: 0 0 0 4px #00d4aa;
+  border: 3px solid #00d4aa;
 }
 
 .card-controls {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
   flex-wrap: wrap;
+  margin-top: 25px;
 }
 
-/* FIVE CARDS GRID */
+/* FIVE CARDS GRID - MINIMAL */
 .cards-grid {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: stretch;
-  gap: 20px;
+  gap: 15px;
   flex-wrap: nowrap;
   max-width: 1000px;
   margin: 0 auto;
 }
 
 .cards-grid .card {
-  width: 180px;
-  height: 220px;
+  width: 170px;
+  height: 200px;
 }
 
 .cards-grid .card-front {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .cards-grid .card-back {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* FILE INPUT */
@@ -432,8 +389,8 @@ h3 {
 
 @media (max-width: 768px) {
   .card {
-    width: 250px;
-    height: 300px;
+    width: 230px;
+    height: 280px;
   }
   #wheelSvg { width: 300px; height: 300px; }
   .stats { gap: 20px; }
@@ -449,26 +406,18 @@ h3 {
   .mode-selector {
     flex-direction: column;
   }
-  .card-mode-choices {
-    flex-direction: column;
-    align-items: center;
-  }
-  .mode-choice-btn {
-    width: 100%;
-    max-width: 300px;
-  }
 }
 
 @media (max-width: 480px) {
   .card {
-    width: 200px;
-    height: 250px;
+    width: 180px;
+    height: 230px;
   }
   .card-front {
-    font-size: 36px;
+    font-size: 32px;
   }
   .card-back {
-    font-size: 16px;
+    font-size: 14px;
   }
   .cards-grid .card {
     width: 100%;
