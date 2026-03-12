@@ -14,10 +14,10 @@ function setSongMode(mode) {
   document.getElementById('csvModeSection').style.display = mode === 'csv' ? 'block' : 'none';
   document.getElementById('manualModeSection').style.display = mode === 'manual' ? 'block' : 'none';
   
+  renderSongList();
   updateSongsDisplay();
   updateSpinBtn();
   checkClearButtons();
-  renderSongList();
 }
 
 // ==================== MANUAL SONGS ====================
@@ -27,11 +27,12 @@ document.getElementById('addSongBtn').onclick = () => {
   if (song && !songs.includes(song)) {
     songs.push(song);
     input.value = '';
-    renderManualSongs();
     renderSongList();
     updateSongsDisplay();
     updateSpinBtn();
     checkClearButtons();
+  } else if (songs.includes(song)) {
+    alert('⚠️ Questa canzone è già presente nella lista!');
   }
 };
 
@@ -40,55 +41,72 @@ document.getElementById('songInput').addEventListener('keypress', e => {
 });
 
 window.removeManualSong = (index) => {
-  const songToRemove = songs[index];
-  const usedIndex = usedSongs.indexOf(songToRemove);
-  if (usedIndex > -1) {
-    usedSongs.splice(usedIndex, 1);
-  }
-  songs.splice(index, 1);
-  renderManualSongs();
-  renderSongList();
-  updateSongsDisplay();
-  updateSpinBtn();
-  checkClearButtons();
+  removeSongByIndex(index);
 };
-
-function renderManualSongs() {
-  const list = document.getElementById('manualSongsList');
-  list.innerHTML = '';
-  songs.forEach((song, i) => {
-    const tag = document.createElement('div');
-    const isUsed = usedSongs.includes(song);
-    tag.className = `tag ${isUsed ? 'used' : ''}`;
-    tag.innerHTML = `
-      ${song} ${isUsed ? '✅' : ''}
-      <button onclick="removeManualSong(${i})">×</button>
-    `;
-    list.appendChild(tag);
-  });
-}
 
 // ==================== CSV ====================
 document.getElementById('csvFile').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
   const reader = new FileReader();
   reader.onload = ev => {
-    songs = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean);
-    usedSongs = [];
+    const content = ev.target.result;
+    const newSongs = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    
+    if (newSongs.length === 0) {
+      alert('⚠️ Il file CSV sembra vuoto!');
+      e.target.value = '';
+      return;
+    }
+    
+    const append = document.getElementById('appendCsv').checked;
+    
+    if (append) {
+      let addedCount = 0;
+      newSongs.forEach(song => {
+        if (!songs.includes(song)) {
+          songs.push(song);
+          addedCount++;
+        }
+      });
+      alert(`✅ Aggiunte ${addedCount} nuove canzoni! (${newSongs.length - addedCount} duplicate ignorate)`);
+    } else {
+      if (songs.length > 0) {
+        if (!confirm('⚠️ Questo eliminerà tutte le canzoni esistenti. Continuare?')) {
+          e.target.value = '';
+          return;
+        }
+      }
+      songs = newSongs;
+      usedSongs = [];
+      alert(`✅ Caricate ${songs.length} canzoni!`);
+    }
+    
+    // ✅ FORZA AGGIORNAMENTO DI TUTTO
     renderSongList();
     updateSongsDisplay();
+    updateStats();
     updateSpinBtn();
     checkClearButtons();
+    
+    // ✅ Resetta l'input file per permettere di ricaricare lo stesso file
+    e.target.value = '';
+    
+    console.log(`🎵 Canzoni totali: ${songs.length}`);
+    console.log(`🎵 Canzoni disponibili: ${songs.filter(s => !usedSongs.includes(s)).length}`);
   };
-  reader.readAsText(e.target.files[0]);
+  
+  reader.onerror = () => {
+    alert('❌ Errore nella lettura del file!');
+    e.target.value = '';
+  };
+  
+  reader.readAsText(file);
 };
 
 function updateSongsDisplay() {
   const availableCount = songs.filter(s => !usedSongs.includes(s)).length;
-  
-  if (songMode === 'csv') {
-    document.getElementById('csvSongsLoaded').textContent = 
-      songs.length ? `${songs.length} canzoni caricate (${availableCount} disponibili)` : '';
-  }
 }
 
 // ==================== SONG LIST RENDER ====================
@@ -125,6 +143,7 @@ window.removeSongByIndex = (index) => {
   songs.splice(index, 1);
   renderSongList();
   updateSongsDisplay();
+  updateStats();
   updateSpinBtn();
   checkClearButtons();
 };
@@ -182,7 +201,13 @@ function updateStats() {
 function updateSpinBtn() {
   const availableParts = participants.filter(p => !usedParticipants.includes(p));
   const availableSongsCount = songs.filter(s => !usedSongs.includes(s)).length;
-  document.getElementById('spinBtn').disabled = availableParts.length === 0 || availableSongsCount === 0;
+  
+  const spinBtn = document.getElementById('spinBtn');
+  const shouldBeDisabled = availableParts.length === 0 || availableSongsCount === 0;
+  
+  spinBtn.disabled = shouldBeDisabled;
+  
+  console.log(`🎯 SpinBtn disabled: ${shouldBeDisabled} (Parts: ${availableParts.length}, Songs: ${availableSongsCount})`);
 }
 
 // ==================== CLEAR ALL BUTTONS ====================
@@ -211,6 +236,7 @@ document.getElementById('clearAllSongsBtn').onclick = () => {
     usedSongs = [];
     renderSongList();
     updateSongsDisplay();
+    updateStats();
     updateSpinBtn();
     checkClearButtons();
   }
