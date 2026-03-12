@@ -38,7 +38,6 @@
         <div class="file-input-wrapper" style="margin-top: 15px;">
           <label for="csvFile" class="file-label">📁 Carica file CSV</label>
           <input type="file" id="csvFile" accept=".csv">
-          <span id="csvSongsLoaded" style="margin-left: 15px; color: #999; font-size: 13px;"></span>
         </div>
       </div>
 
@@ -48,11 +47,19 @@
           <input type="text" id="songInput" placeholder="Titolo canzone..." maxlength="50">
           <button class="btn" id="addSongBtn">Aggiungi</button>
         </div>
-        <div class="participants-tags" id="manualSongsList"></div>
       </div>
       
-      <div style="margin-top: 15px; text-align: center;">
-        <button class="btn btn-danger" id="clearAllSongsBtn" style="display:none;">🗑️ Elimina tutte le canzoni</button>
+      <!-- SONG LIST -->
+      <div style="margin-top: 20px;">
+        <h4 style="margin-bottom: 10px; font-size: 14px; color: #666;">📋 Canzoni caricate (<span id="songCount">0</span>)</h4>
+        <div class="song-list-container" id="songListContainer">
+          <div class="song-list" id="songList">
+            <p style="color: #999; text-align: center; padding: 20px;">Nessuna canzone caricata</p>
+          </div>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+          <button class="btn btn-danger" id="clearAllSongsBtn" style="display:none;">🗑️ Elimina tutte le canzoni</button>
+        </div>
       </div>
     </div>
 

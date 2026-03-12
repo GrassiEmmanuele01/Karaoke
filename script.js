@@ -17,6 +17,7 @@ function setSongMode(mode) {
   updateSongsDisplay();
   updateSpinBtn();
   checkClearButtons();
+  renderSongList();
 }
 
 // ==================== MANUAL SONGS ====================
@@ -27,6 +28,7 @@ document.getElementById('addSongBtn').onclick = () => {
     songs.push(song);
     input.value = '';
     renderManualSongs();
+    renderSongList();
     updateSongsDisplay();
     updateSpinBtn();
     checkClearButtons();
@@ -45,6 +47,7 @@ window.removeManualSong = (index) => {
   }
   songs.splice(index, 1);
   renderManualSongs();
+  renderSongList();
   updateSongsDisplay();
   updateSpinBtn();
   checkClearButtons();
@@ -71,6 +74,7 @@ document.getElementById('csvFile').onchange = e => {
   reader.onload = ev => {
     songs = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean);
     usedSongs = [];
+    renderSongList();
     updateSongsDisplay();
     updateSpinBtn();
     checkClearButtons();
@@ -86,6 +90,44 @@ function updateSongsDisplay() {
       songs.length ? `${songs.length} canzoni caricate (${availableCount} disponibili)` : '';
   }
 }
+
+// ==================== SONG LIST RENDER ====================
+function renderSongList() {
+  const container = document.getElementById('songList');
+  const countSpan = document.getElementById('songCount');
+  
+  countSpan.textContent = songs.length;
+  
+  if (songs.length === 0) {
+    container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Nessuna canzone caricata</p>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  songs.forEach((song, index) => {
+    const isUsed = usedSongs.includes(song);
+    const item = document.createElement('div');
+    item.className = `song-item ${isUsed ? 'used' : ''}`;
+    item.innerHTML = `
+      <span class="song-name">${index + 1}. ${song} ${isUsed ? '✅' : ''}</span>
+      <button onclick="removeSongByIndex(${index})" title="Elimina canzone">×</button>
+    `;
+    container.appendChild(item);
+  });
+}
+
+window.removeSongByIndex = (index) => {
+  const songToRemove = songs[index];
+  const usedIndex = usedSongs.indexOf(songToRemove);
+  if (usedIndex > -1) {
+    usedSongs.splice(usedIndex, 1);
+  }
+  songs.splice(index, 1);
+  renderSongList();
+  updateSongsDisplay();
+  updateSpinBtn();
+  checkClearButtons();
+};
 
 // ==================== PARTICIPANTS ====================
 document.getElementById('addNameBtn').onclick = () => {
@@ -145,16 +187,13 @@ function updateSpinBtn() {
 
 // ==================== CLEAR ALL BUTTONS ====================
 function checkClearButtons() {
-  // Show/hide clear all participants button
   const clearParticipantsBtn = document.getElementById('clearAllParticipantsBtn');
   clearParticipantsBtn.style.display = participants.length > 0 ? 'inline-block' : 'none';
   
-  // Show/hide clear all songs button
   const clearSongsBtn = document.getElementById('clearAllSongsBtn');
   clearSongsBtn.style.display = songs.length > 0 ? 'inline-block' : 'none';
 }
 
-// Clear all participants
 document.getElementById('clearAllParticipantsBtn').onclick = () => {
   if (confirm('Sei sicuro di voler eliminare tutti i cantanti?')) {
     participants = [];
@@ -166,14 +205,11 @@ document.getElementById('clearAllParticipantsBtn').onclick = () => {
   }
 };
 
-// Clear all songs
 document.getElementById('clearAllSongsBtn').onclick = () => {
   if (confirm('Sei sicuro di voler eliminare tutte le canzoni?')) {
     songs = [];
     usedSongs = [];
-    if (songMode === 'manual') {
-      renderManualSongs();
-    }
+    renderSongList();
     updateSongsDisplay();
     updateSpinBtn();
     checkClearButtons();
@@ -191,7 +227,7 @@ document.getElementById('resetBtn').onclick = () => {
     shownSongsInTurn = [];
     
     renderParticipants();
-    if (songMode === 'manual') renderManualSongs();
+    renderSongList();
     updateWheel();
     updateStats();
     updateSongsDisplay();
@@ -524,7 +560,7 @@ function selectSong(songName) {
   });
   
   renderParticipants();
-  if (songMode === 'manual') renderManualSongs();
+  renderSongList();
   updateWheel();
   updateStats();
   updateSongsDisplay();
@@ -544,3 +580,4 @@ updateSpinBtn();
 updateStats();
 updateWheel();
 checkClearButtons();
+renderSongList();

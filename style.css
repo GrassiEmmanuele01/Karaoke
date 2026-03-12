@@ -26,6 +26,11 @@ h3 {
   font-size: 1.1em;
 }
 
+h4 {
+  color: #333;
+  font-size: 14px;
+}
+
 /* SEZIONE INPUT */
 .input-section {
   background: white;
@@ -174,6 +179,65 @@ h3 {
 
 .tag button:hover {
   color: #333;
+}
+
+/* SONG LIST */
+.song-list-container {
+  max-height: 200px; /* Mostra circa 5 righe */
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.song-list {
+  padding: 10px;
+}
+
+.song-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.song-item:last-child {
+  margin-bottom: 0;
+}
+
+.song-item.used {
+  background: #f0f0f0;
+  opacity: 0.7;
+}
+
+.song-item.used .song-name {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.song-name {
+  flex: 1;
+  font-size: 13px;
+  color: #333;
+  word-break: break-word;
+}
+
+.song-item button {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 10px;
+  padding: 0 5px;
+}
+
+.song-item button:hover {
+  color: #ff4757;
 }
 
 /* STATS */
