@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karaoke Wheel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎤 Karaoke Wheel</h1>
+
+    <!-- INPUT SECTION -->
+    <div class="input-section">
+      <div class="input-group">
+        <input type="text" id="nameInput" placeholder="Nome partecipante..." maxlength="20">
+        <button class="btn" id="addNameBtn">Aggiungi</button>
+      </div>
+      
+      <div class="file-input-wrapper">
+        <label for="csvFile" class="file-label">📁 Carica canzoni (CSV)</label>
+        <input type="file" id="csvFile" accept=".csv">
+        <span id="songsLoaded" style="margin-left: 15px; color: #999; font-size: 13px;"></span>
+      </div>
+
+      <div class="participants-tags" id="participantsList"></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-value" id="totalParts">0</div>
+        <div class="stat-label">Partecipanti</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="totalSongs">0</div>
+        <div class="stat-label">Canzoni</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="availableParts">0</div>
+        <div class="stat-label">Disponibili</div>
+      </div>
+    </div>
+
+    <!-- WHEEL SECTION -->
+    <div class="wheel-container">
+      <div class="wheel-wrapper">
+        <svg id="wheelSvg" viewBox="0 0 400 400"></svg>
+        <div class="arrow"></div>
+      </div>
+      <div style="margin-top: 20px;">
+        <button class="btn" id="spinBtn" disabled>Gira la Ruota</button>
+        <button class="btn btn-success" id="showSongsBtn" style="display:none; margin-left: 10px;">Vedi Canzoni</button>
+      </div>
+    </div>
+
+    <!-- CARDS SECTION -->
+    <div class="cards-section" id="cardsSection">
+      <h2 class="cards-title" id="currentPlayer"></h2>
+      <div class="cards-grid" id="cardsGrid"></div>
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-purple" id="proposeMoreBtn" style="display:none;">Proponi altre 5</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
