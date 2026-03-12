@@ -1,6 +1,82 @@
-let participants = [], usedParticipants = [], songs = [], usedSongs = [], currentSongs = [], currentParticipant = [];
+let participants = [], usedParticipants = [], songs = [], usedSongs = [], currentParticipant = [];
+let songMode = 'csv'; // 'csv' or 'manual'
+let currentSongIndex = 0;
+let availableSongsForTurn = [];
 
-// Aggiungi nome
+// ==================== SONG MODE ====================
+function setSongMode(mode) {
+  songMode = mode;
+  
+  // Update buttons
+  document.getElementById('csvModeBtn').classList.toggle('active', mode === 'csv');
+  document.getElementById('manualModeBtn').classList.toggle('active', mode === 'manual');
+  
+  // Show/hide sections
+  document.getElementById('csvModeSection').style.display = mode === 'csv' ? 'block' : 'none';
+  document.getElementById('manualModeSection').style.display = mode === 'manual' ? 'block' : 'none';
+  
+  updateSongsDisplay();
+  updateSpinBtn();
+}
+
+// ==================== MANUAL SONGS ====================
+document.getElementById('addSongBtn').onclick = () => {
+  const input = document.getElementById('songInput');
+  const song = input.value.trim();
+  if (song && !songs.includes(song)) {
+    songs.push(song);
+    input.value = '';
+    renderManualSongs();
+    updateSongsDisplay();
+    updateSpinBtn();
+  }
+};
+
+document.getElementById('songInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') document.getElementById('addSongBtn').click();
+});
+
+window.removeManualSong = (index) => {
+  songs.splice(index, 1);
+  renderManualSongs();
+  updateSongsDisplay();
+  updateSpinBtn();
+};
+
+function renderManualSongs() {
+  const list = document.getElementById('manualSongsList');
+  list.innerHTML = '';
+  songs.forEach((song, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = `
+      ${song}
+      <button onclick="removeManualSong(${i})">×</button>
+    `;
+    list.appendChild(tag);
+  });
+}
+
+// ==================== CSV ====================
+document.getElementById('csvFile').onchange = e => {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    songs = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean);
+    usedSongs = [];
+    updateSongsDisplay();
+    updateSpinBtn();
+  };
+  reader.readAsText(e.target.files[0]);
+};
+
+function updateSongsDisplay() {
+  if (songMode === 'csv') {
+    document.getElementById('csvSongsLoaded').textContent = 
+      songs.length ? `${songs.length} canzoni caricate` : '';
+  }
+}
+
+// ==================== PARTICIPANTS ====================
 document.getElementById('addNameBtn').onclick = () => {
   const input = document.getElementById('nameInput');
   const name = input.value.trim();
@@ -17,30 +93,12 @@ document.getElementById('nameInput').addEventListener('keypress', e => {
   if (e.key === 'Enter') document.getElementById('addNameBtn').click();
 });
 
-// Rimuovi partecipante
 window.removeParticipant = (index) => {
   participants.splice(index, 1);
   renderParticipants();
   updateWheel();
   updateSpinBtn();
 };
-
-// Carica CSV
-document.getElementById('csvFile').onchange = e => {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    songs = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean);
-    usedSongs = [];
-    updateSongsDisplay();
-    updateSpinBtn();
-  };
-  reader.readAsText(e.target.files[0]);
-};
-
-function updateSongsDisplay() {
-  document.getElementById('songsLoaded').textContent = 
-    songs.length ? `${songs.length} canzoni caricate` : '';
-}
 
 function renderParticipants() {
   const list = document.getElementById('participantsList');
@@ -66,33 +124,35 @@ function updateStats() {
 
 function updateSpinBtn() {
   const availableParts = participants.filter(p => !usedParticipants.includes(p));
-  document.getElementById('spinBtn').disabled = availableParts.length === 0 || !songs.length;
+  document.getElementById('spinBtn').disabled = availableParts.length === 0 || songs.length === 0;
 }
 
-// RESET TUTTO - SEMPRE DISPONIBILE
+// ==================== RESET ====================
 document.getElementById('resetBtn').onclick = () => {
   if (confirm('Sei sicuro di voler resettare tutto? Tutti i cantanti e le canzoni saranno di nuovo disponibili.')) {
     usedParticipants = [];
     usedSongs = [];
-    currentParticipant = null;
-    currentSongs = [];
+    currentParticipant = [];
+    currentSongIndex = 0;
+    availableSongsForTurn = [];
     
     renderParticipants();
+    if (songMode === 'manual') renderManualSongs();
     updateWheel();
     updateStats();
     updateSpinBtn();
     
-    // Nascondi sezione carte se visibile
     const cardsSection = document.getElementById('cardsSection');
     cardsSection.classList.remove('showing');
-    document.getElementById('proposeMoreBtn').style.display = 'none';
+    document.getElementById('nextSongBtn').style.display = 'none';
+    document.getElementById('selectSongBtn').style.display = 'none';
     document.getElementById('currentPlayer').textContent = '';
     
     alert('✅ Tutto resettato! Si ricomincia da capo! 🎉');
   }
 };
 
-// Aggiorna ruota
+// ==================== WHEEL ====================
 function updateWheel() {
   const svg = document.getElementById('wheelSvg');
   svg.innerHTML = '';
@@ -125,7 +185,6 @@ function updateWheel() {
   createWheel(available);
 }
 
-// Crea ruota
 function createWheel(names) {
   const svg = document.getElementById('wheelSvg');
   const centerX = 200, centerY = 200, radius = 190;
@@ -177,7 +236,6 @@ function createWheel(names) {
     svg.appendChild(text);
   });
   
-  // Centro
   const centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   centerCircle.setAttribute('cx', centerX);
   centerCircle.setAttribute('cy', centerY);
@@ -186,7 +244,6 @@ function createWheel(names) {
   svg.appendChild(centerCircle);
 }
 
-// Gira ruota
 function spinWheel() {
   const available = participants.filter(p => !usedParticipants.includes(p));
   const numSlices = available.length;
@@ -226,73 +283,58 @@ document.getElementById('spinBtn').onclick = () => {
   document.getElementById('showSongsBtn').style.display = 'none';
 };
 
-// Mostra canzoni
+// ==================== SINGLE CARD DISPLAY ====================
 document.getElementById('showSongsBtn').onclick = () => {
-  createCards();
+  // Prepare available songs for this turn
+  availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
   
+  if (availableSongsForTurn.length === 0) {
+    alert('Tutte le canzoni sono state già utilizzate! Fai reset per ricominciare.');
+    return;
+  }
+  
+  currentSongIndex = 0;
+  showCurrentSong();
+  
+  const cardsSection = document.getElementById('cardsSection');
+  cardsSection.classList.add('showing');
+  cardsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  
+  document.getElementById('showSongsBtn').style.display = 'none';
+  document.getElementById('nextSongBtn').style.display = 'inline-block';
+  document.getElementById('selectSongBtn').style.display = 'inline-block';
+  
+  // Flip card after short delay
   setTimeout(() => {
-    const cardsSection = document.getElementById('cardsSection');
-    cardsSection.classList.add('showing');
-    cardsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
-    document.getElementById('showSongsBtn').style.display = 'none';
-    document.getElementById('proposeMoreBtn').style.display = 'inline-block';
-    setTimeout(() => autoFlipCards(), 500);
-  }, 300);
+    document.getElementById('singleCard').classList.add('flipped');
+  }, 500);
 };
 
-// Proponi altre 5
-document.getElementById('proposeMoreBtn').onclick = () => {
-  createCards();
-  document.querySelectorAll('.card').forEach(card => {
-    card.classList.remove('flipped', 'chosen');
-  });
-  setTimeout(() => autoFlipCards(), 100);
+function showCurrentSong() {
+  const song = availableSongsForTurn[currentSongIndex];
+  document.getElementById('cardBack').textContent = song;
+  document.getElementById('singleCard').classList.remove('flipped', 'selected');
+  
+  // Re-flip after changing content
+  setTimeout(() => {
+    document.getElementById('singleCard').classList.add('flipped');
+  }, 100);
+}
+
+document.getElementById('nextSongBtn').onclick = () => {
+  currentSongIndex = (currentSongIndex + 1) % availableSongsForTurn.length;
+  showCurrentSong();
 };
 
-function createCards() {
-  const grid = document.getElementById('cardsGrid');
-  grid.innerHTML = '';
-  const availableSongs = songs.filter(s => !usedSongs.includes(s));
-  currentSongs = [];
-  
-  const tempSongs = [...availableSongs];
-  while (currentSongs.length < 5 && tempSongs.length) {
-    const randomIndex = Math.floor(Math.random() * tempSongs.length);
-    currentSongs.push(tempSongs.splice(randomIndex, 1)[0]);
-  }
-  
-  currentSongs.forEach((song, i) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.setAttribute('data-song', song);
-    card.innerHTML = `
-      <div class="card-inner">
-        <div class="card-face card-front">${i+1}</div>
-        <div class="card-face card-back">${song}</div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
+document.getElementById('selectSongBtn').onclick = () => {
+  const song = availableSongsForTurn[currentSongIndex];
+  selectSong(song);
+};
 
-function autoFlipCards() {
-  document.querySelectorAll('.card').forEach((card, index) => {
-    setTimeout(() => card.classList.add('flipped'), index * 1000);
-  });
-}
-
-// Selezione carta
-document.addEventListener('click', (e) => {
-  const card = e.target.closest('.card');
-  if (card) {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('chosen'));
-    card.classList.add('chosen');
-    
-    const songName = card.dataset.song;
-    setTimeout(() => selectSong(songName), 300);
-  }
-});
+// Click on card to flip
+document.getElementById('singleCard').onclick = () => {
+  document.getElementById('singleCard').classList.toggle('flipped');
+};
 
 function selectSong(songName) {
   usedSongs.push(songName);
@@ -306,6 +348,7 @@ function selectSong(songName) {
   });
   
   renderParticipants();
+  if (songMode === 'manual') renderManualSongs();
   updateWheel();
   updateStats();
   updateSpinBtn();
@@ -313,9 +356,10 @@ function selectSong(songName) {
   setTimeout(() => {
     const cardsSection = document.getElementById('cardsSection');
     cardsSection.classList.remove('showing');
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('flipped', 'chosen'));
-    document.getElementById('proposeMoreBtn').style.display = 'none';
-    currentParticipant = null;
+    document.getElementById('singleCard').classList.remove('flipped', 'selected');
+    document.getElementById('nextSongBtn').style.display = 'none';
+    document.getElementById('selectSongBtn').style.display = 'none';
+    currentParticipant = [];
     document.getElementById('currentPlayer').textContent = '';
     
     window.scrollTo({ top: 0, behavior: 'smooth' });

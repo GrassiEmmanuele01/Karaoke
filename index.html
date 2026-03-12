@@ -17,13 +17,35 @@
         <button class="btn" id="addNameBtn">Aggiungi</button>
       </div>
       
-      <div class="file-input-wrapper">
-        <label for="csvFile" class="file-label">📁 Carica canzoni (CSV)</label>
-        <input type="file" id="csvFile" accept=".csv">
-        <span id="songsLoaded" style="margin-left: 15px; color: #999; font-size: 13px;"></span>
+      <div class="participants-tags" id="participantsList"></div>
+    </div>
+
+    <!-- SONG MODE SELECTOR -->
+    <div class="input-section">
+      <h3 style="margin-bottom: 15px; font-weight: 500;">📝 Modalità Inserimento Canzoni</h3>
+      
+      <div class="mode-selector">
+        <button class="mode-btn active" id="csvModeBtn" onclick="setSongMode('csv')">📁 CSV</button>
+        <button class="mode-btn" id="manualModeBtn" onclick="setSongMode('manual')">✍️ Manuale</button>
       </div>
 
-      <div class="participants-tags" id="participantsList"></div>
+      <!-- CSV MODE -->
+      <div id="csvModeSection">
+        <div class="file-input-wrapper" style="margin-top: 15px;">
+          <label for="csvFile" class="file-label">📁 Carica file CSV</label>
+          <input type="file" id="csvFile" accept=".csv">
+          <span id="csvSongsLoaded" style="margin-left: 15px; color: #999; font-size: 13px;"></span>
+        </div>
+      </div>
+
+      <!-- MANUAL MODE -->
+      <div id="manualModeSection" style="display: none;">
+        <div class="input-group" style="margin-top: 15px;">
+          <input type="text" id="songInput" placeholder="Titolo canzone..." maxlength="50">
+          <button class="btn" id="addSongBtn">Aggiungi</button>
+        </div>
+        <div class="participants-tags" id="manualSongsList"></div>
+      </div>
     </div>
 
     <!-- STATS -->
@@ -50,17 +72,27 @@
       </div>
       <div style="margin-top: 20px;">
         <button class="btn" id="spinBtn" disabled>Gira la Ruota</button>
-        <button class="btn btn-success" id="showSongsBtn" style="display:none; margin-left: 10px;">Vedi Canzoni</button>
+        <button class="btn btn-success" id="showSongsBtn" style="display:none; margin-left: 10px;">🎵 Vedi Canzone</button>
         <button class="btn btn-reset" id="resetBtn" style="margin-left: 10px;">🔄 Reset</button>
       </div>
     </div>
 
-    <!-- CARDS SECTION -->
+    <!-- SINGLE CARD SECTION -->
     <div class="cards-section" id="cardsSection">
       <h2 class="cards-title" id="currentPlayer"></h2>
-      <div class="cards-grid" id="cardsGrid"></div>
-      <div style="text-align: center; margin-top: 30px;">
-        <button class="btn btn-purple" id="proposeMoreBtn" style="display:none;">Proponi altre 5</button>
+      
+      <div class="single-card-container">
+        <div class="card" id="singleCard">
+          <div class="card-inner">
+            <div class="card-face card-front">🎵</div>
+            <div class="card-face card-back" id="cardBack"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-controls" style="margin-top: 30px;">
+        <button class="btn btn-purple" id="nextSongBtn" style="display:none;">🎲 Altra Canzone</button>
+        <button class="btn btn-success" id="selectSongBtn" style="display:none;">✅ Seleziona</button>
       </div>
     </div>
   </div>
