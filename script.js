@@ -83,18 +83,13 @@ document.getElementById('csvFile').onchange = e => {
       alert(`✅ Caricate ${songs.length} canzoni!`);
     }
     
-    // ✅ FORZA AGGIORNAMENTO DI TUTTO
     renderSongList();
     updateSongsDisplay();
     updateStats();
     updateSpinBtn();
     checkClearButtons();
     
-    // ✅ Resetta l'input file per permettere di ricaricare lo stesso file
     e.target.value = '';
-    
-    console.log(`🎵 Canzoni totali: ${songs.length}`);
-    console.log(`🎵 Canzoni disponibili: ${songs.filter(s => !usedSongs.includes(s)).length}`);
   };
   
   reader.onerror = () => {
@@ -117,7 +112,7 @@ function renderSongList() {
   countSpan.textContent = songs.length;
   
   if (songs.length === 0) {
-    container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Nessuna canzone caricata</p>';
+    container.innerHTML = '<p class="empty">Nessuna canzone</p>';
     return;
   }
   
@@ -128,7 +123,7 @@ function renderSongList() {
     item.className = `song-item ${isUsed ? 'used' : ''}`;
     item.innerHTML = `
       <span class="song-name">${index + 1}. ${song} ${isUsed ? '✅' : ''}</span>
-      <button onclick="removeSongByIndex(${index})" title="Elimina canzone">×</button>
+      <button onclick="removeSongByIndex(${index})">×</button>
     `;
     container.appendChild(item);
   });
@@ -206,8 +201,6 @@ function updateSpinBtn() {
   const shouldBeDisabled = availableParts.length === 0 || availableSongsCount === 0;
   
   spinBtn.disabled = shouldBeDisabled;
-  
-  console.log(`🎯 SpinBtn disabled: ${shouldBeDisabled} (Parts: ${availableParts.length}, Songs: ${availableSongsCount})`);
 }
 
 // ==================== CLEAR ALL BUTTONS ====================
@@ -266,9 +259,9 @@ document.getElementById('resetBtn').onclick = () => {
 };
 
 function hideAllCardSections() {
-  document.getElementById('cardModeSelection').classList.remove('showing');
-  document.getElementById('singleCardSection').classList.remove('showing');
-  document.getElementById('fiveCardsSection').classList.remove('showing');
+  document.getElementById('cardModeSelection').style.display = 'none';
+  document.getElementById('singleCardSection').style.display = 'none';
+  document.getElementById('fiveCardsSection').style.display = 'none';
   document.getElementById('nextSongBtn').style.display = 'none';
   document.getElementById('selectSongBtn').style.display = 'none';
   document.getElementById('proposeMoreBtn').style.display = 'none';
@@ -291,7 +284,7 @@ function updateWheel() {
     circle.setAttribute('cy', 200);
     circle.setAttribute('r', 190);
     circle.setAttribute('fill', '#fafafa');
-    circle.setAttribute('stroke', '#e0e0e0');
+    circle.setAttribute('stroke', '#e5e5e5');
     circle.setAttribute('stroke-width', '2');
     svg.appendChild(circle);
     
@@ -418,7 +411,7 @@ document.getElementById('showSongsBtn').onclick = () => {
   hideAllCardSections();
   
   document.getElementById('cardModePlayer').textContent = `${currentParticipant} - Scegli la tua canzone`;
-  document.getElementById('cardModeSelection').classList.add('showing');
+  document.getElementById('cardModeSelection').style.display = 'block';
   
   setTimeout(() => {
     document.getElementById('cardModeSelection').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -427,7 +420,7 @@ document.getElementById('showSongsBtn').onclick = () => {
 
 // ==================== SELECT CARD MODE ====================
 function selectCardMode(mode) {
-  document.getElementById('cardModeSelection').classList.remove('showing');
+  document.getElementById('cardModeSelection').style.display = 'none';
   
   if (mode === 'single') {
     showSingleCardMode();
@@ -437,9 +430,9 @@ function selectCardMode(mode) {
 }
 
 function backToModeSelection() {
-  document.getElementById('singleCardSection').classList.remove('showing');
-  document.getElementById('fiveCardsSection').classList.remove('showing');
-  document.getElementById('cardModeSelection').classList.add('showing');
+  document.getElementById('singleCardSection').style.display = 'none';
+  document.getElementById('fiveCardsSection').style.display = 'none';
+  document.getElementById('cardModeSelection').style.display = 'block';
 }
 
 // ==================== SINGLE CARD MODE ====================
@@ -456,7 +449,7 @@ function showSingleCardMode() {
   pickRandomSong();
   
   document.getElementById('currentPlayerSingle').textContent = `${currentParticipant} - Scegli la tua canzone`;
-  document.getElementById('singleCardSection').classList.add('showing');
+  document.getElementById('singleCardSection').style.display = 'block';
   document.getElementById('nextSongBtn').style.display = 'inline-block';
   document.getElementById('selectSongBtn').style.display = 'inline-block';
   
@@ -486,7 +479,7 @@ function pickRandomSong() {
 function showCurrentSong() {
   const song = availableSongsForTurn[currentSongIndex];
   document.getElementById('cardBack').textContent = song;
-  document.getElementById('singleCard').classList.remove('flipped', 'selected');
+  document.getElementById('singleCard').classList.remove('flipped');
   
   setTimeout(() => {
     document.getElementById('singleCard').classList.add('flipped');
@@ -511,7 +504,7 @@ function showFiveCardsMode() {
   createFiveCards();
   
   document.getElementById('currentPlayerFive').textContent = `${currentParticipant} - Scegli la tua canzone`;
-  document.getElementById('fiveCardsSection').classList.add('showing');
+  document.getElementById('fiveCardsSection').style.display = 'block';
   document.getElementById('proposeMoreBtn').style.display = 'inline-block';
   
   setTimeout(() => autoFlipCards(), 500);
@@ -536,12 +529,12 @@ function createFiveCards() {
   
   currentSongs.forEach((song, i) => {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'flip-card';
     card.setAttribute('data-song', song);
     card.innerHTML = `
-      <div class="card-inner">
-        <div class="card-face card-front">${i+1}</div>
-        <div class="card-face card-back">${song}</div>
+      <div class="flip-inner">
+        <div class="flip-front">${i+1}</div>
+        <div class="flip-back">${song}</div>
       </div>
     `;
     grid.appendChild(card);
@@ -549,24 +542,24 @@ function createFiveCards() {
 }
 
 function autoFlipCards() {
-  document.querySelectorAll('#cardsGrid .card').forEach((card, index) => {
+  document.querySelectorAll('#cardsGrid .flip-card').forEach((card, index) => {
     setTimeout(() => card.classList.add('flipped'), index * 1000);
   });
 }
 
 document.getElementById('proposeMoreBtn').onclick = () => {
   createFiveCards();
-  document.querySelectorAll('#cardsGrid .card').forEach(card => {
-    card.classList.remove('flipped', 'chosen');
+  document.querySelectorAll('#cardsGrid .flip-card').forEach(card => {
+    card.classList.remove('flipped');
   });
   setTimeout(() => autoFlipCards(), 100);
 };
 
 document.addEventListener('click', (e) => {
-  const card = e.target.closest('#cardsGrid .card');
+  const card = e.target.closest('#cardsGrid .flip-card');
   if (card) {
-    document.querySelectorAll('#cardsGrid .card').forEach(c => c.classList.remove('chosen'));
-    card.classList.add('chosen');
+    document.querySelectorAll('#cardsGrid .flip-card').forEach(c => c.classList.remove('flipped'));
+    card.classList.add('flipped');
     
     const songName = card.dataset.song;
     setTimeout(() => selectSong(songName), 300);
