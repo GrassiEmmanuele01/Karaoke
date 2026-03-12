@@ -589,7 +589,14 @@ function selectSong(songName) {
     hideAllCardSections();
     currentParticipant = [];
     
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // ✅ SCROLL AUTOMATICO VERSO LA RUOTA
+    const wheelSection = document.querySelector('.wheel-section');
+    if (wheelSection) {
+      wheelSection.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
   }, 1000);
 }
 
