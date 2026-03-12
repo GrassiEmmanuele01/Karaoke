@@ -16,6 +16,7 @@ function setSongMode(mode) {
   
   updateSongsDisplay();
   updateSpinBtn();
+  checkClearButtons();
 }
 
 // ==================== MANUAL SONGS ====================
@@ -28,6 +29,7 @@ document.getElementById('addSongBtn').onclick = () => {
     renderManualSongs();
     updateSongsDisplay();
     updateSpinBtn();
+    checkClearButtons();
   }
 };
 
@@ -45,6 +47,7 @@ window.removeManualSong = (index) => {
   renderManualSongs();
   updateSongsDisplay();
   updateSpinBtn();
+  checkClearButtons();
 };
 
 function renderManualSongs() {
@@ -70,6 +73,7 @@ document.getElementById('csvFile').onchange = e => {
     usedSongs = [];
     updateSongsDisplay();
     updateSpinBtn();
+    checkClearButtons();
   };
   reader.readAsText(e.target.files[0]);
 };
@@ -93,6 +97,7 @@ document.getElementById('addNameBtn').onclick = () => {
     renderParticipants();
     updateWheel();
     updateSpinBtn();
+    checkClearButtons();
   }
 };
 
@@ -105,6 +110,7 @@ window.removeParticipant = (index) => {
   renderParticipants();
   updateWheel();
   updateSpinBtn();
+  checkClearButtons();
 };
 
 function renderParticipants() {
@@ -136,6 +142,43 @@ function updateSpinBtn() {
   const availableSongsCount = songs.filter(s => !usedSongs.includes(s)).length;
   document.getElementById('spinBtn').disabled = availableParts.length === 0 || availableSongsCount === 0;
 }
+
+// ==================== CLEAR ALL BUTTONS ====================
+function checkClearButtons() {
+  // Show/hide clear all participants button
+  const clearParticipantsBtn = document.getElementById('clearAllParticipantsBtn');
+  clearParticipantsBtn.style.display = participants.length > 0 ? 'inline-block' : 'none';
+  
+  // Show/hide clear all songs button
+  const clearSongsBtn = document.getElementById('clearAllSongsBtn');
+  clearSongsBtn.style.display = songs.length > 0 ? 'inline-block' : 'none';
+}
+
+// Clear all participants
+document.getElementById('clearAllParticipantsBtn').onclick = () => {
+  if (confirm('Sei sicuro di voler eliminare tutti i cantanti?')) {
+    participants = [];
+    usedParticipants = [];
+    renderParticipants();
+    updateWheel();
+    updateSpinBtn();
+    checkClearButtons();
+  }
+};
+
+// Clear all songs
+document.getElementById('clearAllSongsBtn').onclick = () => {
+  if (confirm('Sei sicuro di voler eliminare tutte le canzoni?')) {
+    songs = [];
+    usedSongs = [];
+    if (songMode === 'manual') {
+      renderManualSongs();
+    }
+    updateSongsDisplay();
+    updateSpinBtn();
+    checkClearButtons();
+  }
+};
 
 // ==================== RESET ====================
 document.getElementById('resetBtn').onclick = () => {
@@ -500,3 +543,4 @@ updateSongsDisplay();
 updateSpinBtn();
 updateStats();
 updateWheel();
+checkClearButtons();

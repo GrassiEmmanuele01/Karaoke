@@ -130,6 +130,14 @@ h3 {
   background: #ee5a5a;
 }
 
+.btn-danger {
+  background: #ff4757;
+}
+
+.btn-danger:hover {
+  background: #ff3838;
+}
+
 /* LISTA TAG */
 .participants-tags {
   display: flex;
@@ -293,14 +301,12 @@ h3 {
   border: 2px solid #e0e0e0;
 }
 
-/* Fronte carta - colore solido */
 .card-front {
   background: #667eea;
   color: white;
   font-size: 42px;
 }
 
-/* Retro carta - colore solido */
 .card-back {
   background: #f093fb;
   color: white;
