@@ -60,11 +60,7 @@
       </div>
       <div class="stat-item">
         <div class="stat-value" id="availableSongs">0</div>
-        <div class="stat-label">Canzoni Disponibili</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="availableParts">0</div>
-        <div class="stat-label">Cantanti Disponibili</div>
+        <div class="stat-label">Disponibili</div>
       </div>
     </div>
 
@@ -76,14 +72,34 @@
       </div>
       <div style="margin-top: 20px;">
         <button class="btn" id="spinBtn" disabled>Gira la Ruota</button>
-        <button class="btn btn-success" id="showSongsBtn" style="display:none; margin-left: 10px;">🎵 Vedi Canzone</button>
+        <button class="btn btn-success" id="showSongsBtn" style="display:none; margin-left: 10px;">🎵 Vedi Canzoni</button>
         <button class="btn btn-reset" id="resetBtn" style="margin-left: 10px;">🔄 Reset</button>
       </div>
     </div>
 
+    <!-- CARD MODE SELECTION (appears after clicking "Vedi Canzoni") -->
+    <div class="cards-section" id="cardModeSelection">
+      <h2 class="cards-title" id="cardModePlayer"></h2>
+      <p style="text-align: center; margin-bottom: 30px; color: #666;">Come vuoi visualizzare le canzoni?</p>
+      
+      <div class="card-mode-choices">
+        <button class="mode-choice-btn" id="chooseSingleCard" onclick="selectCardMode('single')">
+          <div class="mode-choice-icon">🎵</div>
+          <div class="mode-choice-text">Singola Canzone</div>
+          <div class="mode-choice-desc">Una carta alla volta</div>
+        </button>
+        
+        <button class="mode-choice-btn" id="chooseFiveCards" onclick="selectCardMode('five')">
+          <div class="mode-choice-icon">🃏</div>
+          <div class="mode-choice-text">5 Carte</div>
+          <div class="mode-choice-desc">Cinque carte in fila</div>
+        </button>
+      </div>
+    </div>
+
     <!-- SINGLE CARD SECTION -->
-    <div class="cards-section" id="cardsSection">
-      <h2 class="cards-title" id="currentPlayer"></h2>
+    <div class="cards-section" id="singleCardSection">
+      <h2 class="cards-title" id="currentPlayerSingle"></h2>
       
       <div class="single-card-container">
         <div class="card" id="singleCard">
@@ -97,6 +113,17 @@
       <div class="card-controls" style="margin-top: 30px;">
         <button class="btn btn-purple" id="nextSongBtn" style="display:none;">🎲 Altra Canzone</button>
         <button class="btn btn-success" id="selectSongBtn" style="display:none;">✅ Seleziona</button>
+        <button class="btn" onclick="backToModeSelection()" style="margin-left: 10px;">⬅️ Indietro</button>
+      </div>
+    </div>
+
+    <!-- FIVE CARDS SECTION -->
+    <div class="cards-section" id="fiveCardsSection">
+      <h2 class="cards-title" id="currentPlayerFive"></h2>
+      <div class="cards-grid" id="cardsGrid"></div>
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-purple" id="proposeMoreBtn" style="display:none;">🎲 Proponi altre 5</button>
+        <button class="btn" onclick="backToModeSelection()" style="margin-left: 10px;">⬅️ Indietro</button>
       </div>
     </div>
   </div>

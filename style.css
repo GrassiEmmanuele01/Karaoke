@@ -231,7 +231,7 @@ h3 {
   border-right: 25px solid #333;
 }
 
-/* CARD SINGOLA */
+/* CARD SECTIONS */
 .cards-section {
   background: white;
   padding: 40px 20px;
@@ -254,6 +254,51 @@ h3 {
   font-weight: 400;
 }
 
+/* CARD MODE SELECTION */
+.card-mode-choices {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.mode-choice-btn {
+  background: white;
+  border: 3px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 40px 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  min-width: 200px;
+}
+
+.mode-choice-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.mode-choice-icon {
+  font-size: 48px;
+}
+
+.mode-choice-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.mode-choice-desc {
+  font-size: 14px;
+  color: #999;
+}
+
+/* SINGLE CARD */
 .single-card-container {
   display: flex;
   justify-content: center;
@@ -320,6 +365,31 @@ h3 {
   flex-wrap: wrap;
 }
 
+/* FIVE CARDS GRID */
+.cards-grid {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 20px;
+  flex-wrap: nowrap;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.cards-grid .card {
+  width: 180px;
+  height: 220px;
+}
+
+.cards-grid .card-front {
+  font-size: 24px;
+}
+
+.cards-grid .card-back {
+  font-size: 14px;
+}
+
 /* FILE INPUT */
 .file-input-wrapper {
   margin: 10px 0;
@@ -351,6 +421,15 @@ h3 {
 }
 
 /* RESPONSIVE */
+@media (max-width: 1024px) {
+  .cards-grid {
+    flex-wrap: wrap;
+  }
+  .cards-grid .card {
+    width: calc(50% - 10px);
+  }
+}
+
 @media (max-width: 768px) {
   .card {
     width: 250px;
@@ -370,6 +449,14 @@ h3 {
   .mode-selector {
     flex-direction: column;
   }
+  .card-mode-choices {
+    flex-direction: column;
+    align-items: center;
+  }
+  .mode-choice-btn {
+    width: 100%;
+    max-width: 300px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -382,5 +469,8 @@ h3 {
   }
   .card-back {
     font-size: 16px;
+  }
+  .cards-grid .card {
+    width: 100%;
   }
 }

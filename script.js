@@ -2,7 +2,7 @@ let participants = [], usedParticipants = [], songs = [], usedSongs = [], curren
 let songMode = 'csv';
 let currentSongIndex = 0;
 let availableSongsForTurn = [];
-let shownSongsInTurn = []; // ✅ Track songs shown in current turn
+let shownSongsInTurn = [];
 
 // ==================== SONG MODE ====================
 function setSongMode(mode) {
@@ -129,7 +129,6 @@ function updateStats() {
   document.getElementById('totalParts').textContent = participants.length;
   document.getElementById('totalSongs').textContent = songs.length;
   document.getElementById('availableSongs').textContent = availableSongsCount;
-  document.getElementById('availableParts').textContent = available.length;
 }
 
 function updateSpinBtn() {
@@ -155,15 +154,23 @@ document.getElementById('resetBtn').onclick = () => {
     updateSongsDisplay();
     updateSpinBtn();
     
-    const cardsSection = document.getElementById('cardsSection');
-    cardsSection.classList.remove('showing');
-    document.getElementById('nextSongBtn').style.display = 'none';
-    document.getElementById('selectSongBtn').style.display = 'none';
-    document.getElementById('currentPlayer').textContent = '';
+    hideAllCardSections();
     
     alert('✅ Tutto resettato! Si ricomincia da capo! 🎉');
   }
 };
+
+function hideAllCardSections() {
+  document.getElementById('cardModeSelection').classList.remove('showing');
+  document.getElementById('singleCardSection').classList.remove('showing');
+  document.getElementById('fiveCardsSection').classList.remove('showing');
+  document.getElementById('nextSongBtn').style.display = 'none';
+  document.getElementById('selectSongBtn').style.display = 'none';
+  document.getElementById('proposeMoreBtn').style.display = 'none';
+  document.getElementById('currentPlayerSingle').textContent = '';
+  document.getElementById('currentPlayerFive').textContent = '';
+  document.getElementById('cardModePlayer').textContent = '';
+}
 
 // ==================== WHEEL ====================
 function updateWheel() {
@@ -283,7 +290,6 @@ function spinWheel() {
       requestAnimationFrame(animate);
     } else {
       currentParticipant = available[winnerIndex];
-      document.getElementById('currentPlayer').textContent = `${currentParticipant} - Scegli la tua canzone`;
       document.getElementById('showSongsBtn').style.display = 'inline-block';
       document.getElementById('spinBtn').disabled = false;
     }
@@ -296,51 +302,83 @@ document.getElementById('spinBtn').onclick = () => {
   document.getElementById('showSongsBtn').style.display = 'none';
 };
 
-// ==================== SINGLE CARD DISPLAY - RANDOM ✅ ====================
+// ==================== SHOW CARD MODE SELECTION ====================
 document.getElementById('showSongsBtn').onclick = () => {
-  // Filter out used songs
-  availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
-  
-  if (availableSongsForTurn.length === 0) {
+  // Check if there are available songs
+  const availableCount = songs.filter(s => !usedSongs.includes(s)).length;
+  if (availableCount === 0) {
     alert('⚠️ Tutte le canzoni sono state già utilizzate! Clicca Reset per ricominciare.');
     return;
   }
   
-  // ✅ Reset shown songs for this turn
-  shownSongsInTurn = [];
+  // Hide all card sections first
+  hideAllCardSections();
   
-  // ✅ Pick first random song
+  // Show the mode selection screen
+  document.getElementById('cardModePlayer').textContent = `${currentParticipant} - Scegli la tua canzone`;
+  document.getElementById('cardModeSelection').classList.add('showing');
+  
+  // Scroll to selection
+  setTimeout(() => {
+    document.getElementById('cardModeSelection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300);
+};
+
+// ==================== SELECT CARD MODE ====================
+function selectCardMode(mode) {
+  // Hide mode selection
+  document.getElementById('cardModeSelection').classList.remove('showing');
+  
+  if (mode === 'single') {
+    showSingleCardMode();
+  } else {
+    showFiveCardsMode();
+  }
+}
+
+// Back to mode selection
+function backToModeSelection() {
+  document.getElementById('singleCardSection').classList.remove('showing');
+  document.getElementById('fiveCardsSection').classList.remove('showing');
+  document.getElementById('cardModeSelection').classList.add('showing');
+}
+
+// ==================== SINGLE CARD MODE ====================
+function showSingleCardMode() {
+  availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
+  
+  if (availableSongsForTurn.length === 0) {
+    alert('⚠️ Tutte le canzoni sono state già utilizzate! Clicca Reset per ricominciare.');
+    backToModeSelection();
+    return;
+  }
+  
+  shownSongsInTurn = [];
   pickRandomSong();
   
-  const cardsSection = document.getElementById('cardsSection');
-  cardsSection.classList.add('showing');
-  cardsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  
-  document.getElementById('showSongsBtn').style.display = 'none';
+  document.getElementById('currentPlayerSingle').textContent = `${currentParticipant} - Scegli la tua canzone`;
+  document.getElementById('singleCardSection').classList.add('showing');
   document.getElementById('nextSongBtn').style.display = 'inline-block';
   document.getElementById('selectSongBtn').style.display = 'inline-block';
   
   setTimeout(() => {
     document.getElementById('singleCard').classList.add('flipped');
   }, 500);
-};
+  
+  setTimeout(() => {
+    document.getElementById('singleCardSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300);
+}
 
-// ✅ Pick a random song that hasn't been shown in this turn
 function pickRandomSong() {
-  // Get songs not yet shown in this turn
   const notShownYet = availableSongsForTurn.filter(s => !shownSongsInTurn.includes(s));
   
   if (notShownYet.length === 0) {
-    // All songs have been shown, reset and allow repeats
     shownSongsInTurn = [];
-    return;
   }
   
-  // ✅ Pick random index from remaining songs
   const randomIndex = Math.floor(Math.random() * notShownYet.length);
   currentSongIndex = availableSongsForTurn.indexOf(notShownYet[randomIndex]);
-  
-  // Add to shown list
   shownSongsInTurn.push(availableSongsForTurn[currentSongIndex]);
   
   showCurrentSong();
@@ -356,7 +394,6 @@ function showCurrentSong() {
   }, 100);
 }
 
-// ✅ Click "Altra Canzone" picks another RANDOM song
 document.getElementById('nextSongBtn').onclick = () => {
   pickRandomSong();
 };
@@ -370,6 +407,74 @@ document.getElementById('singleCard').onclick = () => {
   document.getElementById('singleCard').classList.toggle('flipped');
 };
 
+// ==================== FIVE CARDS MODE ====================
+function showFiveCardsMode() {
+  createFiveCards();
+  
+  document.getElementById('currentPlayerFive').textContent = `${currentParticipant} - Scegli la tua canzone`;
+  document.getElementById('fiveCardsSection').classList.add('showing');
+  document.getElementById('proposeMoreBtn').style.display = 'inline-block';
+  
+  setTimeout(() => autoFlipCards(), 500);
+  
+  setTimeout(() => {
+    document.getElementById('fiveCardsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300);
+}
+
+function createFiveCards() {
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+  availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
+  
+  const tempSongs = [...availableSongsForTurn];
+  const currentSongs = [];
+  
+  while (currentSongs.length < 5 && tempSongs.length) {
+    const randomIndex = Math.floor(Math.random() * tempSongs.length);
+    currentSongs.push(tempSongs.splice(randomIndex, 1)[0]);
+  }
+  
+  currentSongs.forEach((song, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-song', song);
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-front">${i+1}</div>
+        <div class="card-face card-back">${song}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function autoFlipCards() {
+  document.querySelectorAll('#cardsGrid .card').forEach((card, index) => {
+    setTimeout(() => card.classList.add('flipped'), index * 1000);
+  });
+}
+
+document.getElementById('proposeMoreBtn').onclick = () => {
+  createFiveCards();
+  document.querySelectorAll('#cardsGrid .card').forEach(card => {
+    card.classList.remove('flipped', 'chosen');
+  });
+  setTimeout(() => autoFlipCards(), 100);
+};
+
+document.addEventListener('click', (e) => {
+  const card = e.target.closest('#cardsGrid .card');
+  if (card) {
+    document.querySelectorAll('#cardsGrid .card').forEach(c => c.classList.remove('chosen'));
+    card.classList.add('chosen');
+    
+    const songName = card.dataset.song;
+    setTimeout(() => selectSong(songName), 300);
+  }
+});
+
+// ==================== SELECT SONG ====================
 function selectSong(songName) {
   usedSongs.push(songName);
   
@@ -389,13 +494,8 @@ function selectSong(songName) {
   updateSpinBtn();
   
   setTimeout(() => {
-    const cardsSection = document.getElementById('cardsSection');
-    cardsSection.classList.remove('showing');
-    document.getElementById('singleCard').classList.remove('flipped', 'selected');
-    document.getElementById('nextSongBtn').style.display = 'none';
-    document.getElementById('selectSongBtn').style.display = 'none';
+    hideAllCardSections();
     currentParticipant = [];
-    document.getElementById('currentPlayer').textContent = '';
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 1000);
