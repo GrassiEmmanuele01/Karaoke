@@ -1,5 +1,5 @@
 let participants = [], usedParticipants = [], songs = [], usedSongs = [], currentParticipant = [];
-let songMode = 'csv'; // 'csv' or 'manual'
+let songMode = 'csv';
 let currentSongIndex = 0;
 let availableSongsForTurn = [];
 
@@ -7,11 +7,9 @@ let availableSongsForTurn = [];
 function setSongMode(mode) {
   songMode = mode;
   
-  // Update buttons
   document.getElementById('csvModeBtn').classList.toggle('active', mode === 'csv');
   document.getElementById('manualModeBtn').classList.toggle('active', mode === 'manual');
   
-  // Show/hide sections
   document.getElementById('csvModeSection').style.display = mode === 'csv' ? 'block' : 'none';
   document.getElementById('manualModeSection').style.display = mode === 'manual' ? 'block' : 'none';
   
@@ -37,6 +35,12 @@ document.getElementById('songInput').addEventListener('keypress', e => {
 });
 
 window.removeManualSong = (index) => {
+  const songToRemove = songs[index];
+  // Remove from usedSongs if it was there
+  const usedIndex = usedSongs.indexOf(songToRemove);
+  if (usedIndex > -1) {
+    usedSongs.splice(usedIndex, 1);
+  }
   songs.splice(index, 1);
   renderManualSongs();
   updateSongsDisplay();
@@ -48,9 +52,11 @@ function renderManualSongs() {
   list.innerHTML = '';
   songs.forEach((song, i) => {
     const tag = document.createElement('div');
-    tag.className = 'tag';
+    // ✅ Mark song as used if it's in usedSongs array
+    const isUsed = usedSongs.includes(song);
+    tag.className = `tag ${isUsed ? 'used' : ''}`;
     tag.innerHTML = `
-      ${song}
+      ${song} ${isUsed ? '✅' : ''}
       <button onclick="removeManualSong(${i})">×</button>
     `;
     list.appendChild(tag);
@@ -70,9 +76,11 @@ document.getElementById('csvFile').onchange = e => {
 };
 
 function updateSongsDisplay() {
+  const availableCount = songs.filter(s => !usedSongs.includes(s)).length;
+  
   if (songMode === 'csv') {
     document.getElementById('csvSongsLoaded').textContent = 
-      songs.length ? `${songs.length} canzoni caricate` : '';
+      songs.length ? `${songs.length} canzoni caricate (${availableCount} disponibili)` : '';
   }
 }
 
@@ -117,14 +125,18 @@ function renderParticipants() {
 
 function updateStats() {
   const available = participants.filter(p => !usedParticipants.includes(p));
+  const availableSongsCount = songs.filter(s => !usedSongs.includes(s)).length;
+  
   document.getElementById('totalParts').textContent = participants.length;
   document.getElementById('totalSongs').textContent = songs.length;
+  document.getElementById('availableSongs').textContent = availableSongsCount;
   document.getElementById('availableParts').textContent = available.length;
 }
 
 function updateSpinBtn() {
   const availableParts = participants.filter(p => !usedParticipants.includes(p));
-  document.getElementById('spinBtn').disabled = availableParts.length === 0 || songs.length === 0;
+  const availableSongsCount = songs.filter(s => !usedSongs.includes(s)).length;
+  document.getElementById('spinBtn').disabled = availableParts.length === 0 || availableSongsCount === 0;
 }
 
 // ==================== RESET ====================
@@ -140,6 +152,7 @@ document.getElementById('resetBtn').onclick = () => {
     if (songMode === 'manual') renderManualSongs();
     updateWheel();
     updateStats();
+    updateSongsDisplay();
     updateSpinBtn();
     
     const cardsSection = document.getElementById('cardsSection');
@@ -285,11 +298,11 @@ document.getElementById('spinBtn').onclick = () => {
 
 // ==================== SINGLE CARD DISPLAY ====================
 document.getElementById('showSongsBtn').onclick = () => {
-  // Prepare available songs for this turn
+  // ✅ Filter out used songs - they are NOT available for this turn
   availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
   
   if (availableSongsForTurn.length === 0) {
-    alert('Tutte le canzoni sono state già utilizzate! Fai reset per ricominciare.');
+    alert('⚠️ Tutte le canzoni sono state già utilizzate! Clicca Reset per ricominciare.');
     return;
   }
   
@@ -304,7 +317,6 @@ document.getElementById('showSongsBtn').onclick = () => {
   document.getElementById('nextSongBtn').style.display = 'inline-block';
   document.getElementById('selectSongBtn').style.display = 'inline-block';
   
-  // Flip card after short delay
   setTimeout(() => {
     document.getElementById('singleCard').classList.add('flipped');
   }, 500);
@@ -315,7 +327,6 @@ function showCurrentSong() {
   document.getElementById('cardBack').textContent = song;
   document.getElementById('singleCard').classList.remove('flipped', 'selected');
   
-  // Re-flip after changing content
   setTimeout(() => {
     document.getElementById('singleCard').classList.add('flipped');
   }, 100);
@@ -331,12 +342,12 @@ document.getElementById('selectSongBtn').onclick = () => {
   selectSong(song);
 };
 
-// Click on card to flip
 document.getElementById('singleCard').onclick = () => {
   document.getElementById('singleCard').classList.toggle('flipped');
 };
 
 function selectSong(songName) {
+  // ✅ Add song to usedSongs - it will NOT be available for subsequent singers
   usedSongs.push(songName);
   
   if (currentParticipant && !usedParticipants.includes(currentParticipant)) {
@@ -344,13 +355,14 @@ function selectSong(songName) {
   }
   
   navigator.clipboard.writeText(songName).then(() => {
-    alert(`"${songName}" copiato!\n${currentParticipant} canterà questa canzone`);
+    alert(`"${songName}" copiato!\n${currentParticipant} canterà questa canzone\n\n⚠️ Questa canzone non sarà più disponibile per gli altri cantanti!`);
   });
   
   renderParticipants();
   if (songMode === 'manual') renderManualSongs();
   updateWheel();
   updateStats();
+  updateSongsDisplay();
   updateSpinBtn();
   
   setTimeout(() => {

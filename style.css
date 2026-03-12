@@ -174,8 +174,9 @@ h3 {
 .stats {
   display: flex;
   justify-content: center;
-  gap: 40px;
+  gap: 30px;
   margin: 20px 0;
+  flex-wrap: wrap;
 }
 
 .stat-item {
