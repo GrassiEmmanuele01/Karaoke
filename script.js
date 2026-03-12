@@ -2,6 +2,7 @@ let participants = [], usedParticipants = [], songs = [], usedSongs = [], curren
 let songMode = 'csv';
 let currentSongIndex = 0;
 let availableSongsForTurn = [];
+let shownSongsInTurn = []; // ✅ Track songs shown in current turn
 
 // ==================== SONG MODE ====================
 function setSongMode(mode) {
@@ -36,7 +37,6 @@ document.getElementById('songInput').addEventListener('keypress', e => {
 
 window.removeManualSong = (index) => {
   const songToRemove = songs[index];
-  // Remove from usedSongs if it was there
   const usedIndex = usedSongs.indexOf(songToRemove);
   if (usedIndex > -1) {
     usedSongs.splice(usedIndex, 1);
@@ -52,7 +52,6 @@ function renderManualSongs() {
   list.innerHTML = '';
   songs.forEach((song, i) => {
     const tag = document.createElement('div');
-    // ✅ Mark song as used if it's in usedSongs array
     const isUsed = usedSongs.includes(song);
     tag.className = `tag ${isUsed ? 'used' : ''}`;
     tag.innerHTML = `
@@ -147,6 +146,7 @@ document.getElementById('resetBtn').onclick = () => {
     currentParticipant = [];
     currentSongIndex = 0;
     availableSongsForTurn = [];
+    shownSongsInTurn = [];
     
     renderParticipants();
     if (songMode === 'manual') renderManualSongs();
@@ -296,9 +296,9 @@ document.getElementById('spinBtn').onclick = () => {
   document.getElementById('showSongsBtn').style.display = 'none';
 };
 
-// ==================== SINGLE CARD DISPLAY ====================
+// ==================== SINGLE CARD DISPLAY - RANDOM ✅ ====================
 document.getElementById('showSongsBtn').onclick = () => {
-  // ✅ Filter out used songs - they are NOT available for this turn
+  // Filter out used songs
   availableSongsForTurn = songs.filter(s => !usedSongs.includes(s));
   
   if (availableSongsForTurn.length === 0) {
@@ -306,8 +306,11 @@ document.getElementById('showSongsBtn').onclick = () => {
     return;
   }
   
-  currentSongIndex = 0;
-  showCurrentSong();
+  // ✅ Reset shown songs for this turn
+  shownSongsInTurn = [];
+  
+  // ✅ Pick first random song
+  pickRandomSong();
   
   const cardsSection = document.getElementById('cardsSection');
   cardsSection.classList.add('showing');
@@ -322,6 +325,27 @@ document.getElementById('showSongsBtn').onclick = () => {
   }, 500);
 };
 
+// ✅ Pick a random song that hasn't been shown in this turn
+function pickRandomSong() {
+  // Get songs not yet shown in this turn
+  const notShownYet = availableSongsForTurn.filter(s => !shownSongsInTurn.includes(s));
+  
+  if (notShownYet.length === 0) {
+    // All songs have been shown, reset and allow repeats
+    shownSongsInTurn = [];
+    return;
+  }
+  
+  // ✅ Pick random index from remaining songs
+  const randomIndex = Math.floor(Math.random() * notShownYet.length);
+  currentSongIndex = availableSongsForTurn.indexOf(notShownYet[randomIndex]);
+  
+  // Add to shown list
+  shownSongsInTurn.push(availableSongsForTurn[currentSongIndex]);
+  
+  showCurrentSong();
+}
+
 function showCurrentSong() {
   const song = availableSongsForTurn[currentSongIndex];
   document.getElementById('cardBack').textContent = song;
@@ -332,9 +356,9 @@ function showCurrentSong() {
   }, 100);
 }
 
+// ✅ Click "Altra Canzone" picks another RANDOM song
 document.getElementById('nextSongBtn').onclick = () => {
-  currentSongIndex = (currentSongIndex + 1) % availableSongsForTurn.length;
-  showCurrentSong();
+  pickRandomSong();
 };
 
 document.getElementById('selectSongBtn').onclick = () => {
@@ -347,7 +371,6 @@ document.getElementById('singleCard').onclick = () => {
 };
 
 function selectSong(songName) {
-  // ✅ Add song to usedSongs - it will NOT be available for subsequent singers
   usedSongs.push(songName);
   
   if (currentParticipant && !usedParticipants.includes(currentParticipant)) {
