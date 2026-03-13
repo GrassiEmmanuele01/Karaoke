@@ -1,6 +1,6 @@
 # 🎤 Karaoke Wheel
 
-Applicazione web interattiva per gestire serate karaoke. Gira la ruota per scegliere il prossimo cantante, poi assegna le canzoni con modalità flip-card — singola o a scelta multipla.
+Applicazione web interattiva per gestire serate karaoke. Gira la ruota per scegliere il prossimo cantante, poi assegna le canzoni con modalità flip-card — singola o a scelta multipla. Supporta anche le penitenze per chi non vuole cantare.
 
 Nessuna dipendenza, nessun server: basta aprire `index.html` nel browser.
 
@@ -14,7 +14,6 @@ Nessuna dipendenza, nessun server: basta aprire `index.html` nel browser.
 - [Formato CSV](#formato-csv)
 - [Struttura del progetto](#struttura-del-progetto)
 - [Architettura e stato applicativo](#architettura-e-stato-applicativo)
-- [Implementazioni future](#implementazioni-future)
 
 ---
 
@@ -23,7 +22,7 @@ Nessuna dipendenza, nessun server: basta aprire `index.html` nel browser.
 1. Apri `index.html` nel browser
 2. Aggiungi almeno un partecipante e una canzone
 3. Clicca **Gira la Ruota**
-4. Scegli la modalità di estrazione canzone
+4. Scegli la modalità di estrazione canzone (o penitenza)
 5. Ripeti per ogni turno — la ruota esclude automaticamente chi ha già cantato
 
 ---
@@ -47,6 +46,18 @@ Le canzoni si possono aggiungere in due modi, selezionabili tramite le tab **CSV
 **Manuale** — Inserimento testo libero, supporta il tasto `Enter`. Anche qui i duplicati vengono segnalati e scartati.
 
 In entrambe le modalità la lista mostra tutte le canzoni caricate con numerazione, stato (usata/disponibile) e pulsante di rimozione singola.
+
+### Gestione penitenze
+
+Le penitenze si aggiungono tramite campo testo (anche con `Enter`) e vengono mostrate in una lista con numerazione, stato (usata/disponibile) e rimozione singola. Il pulsante **Elimina tutte** appare quando la lista non è vuota.
+
+Le penitenze hanno due utilizzi distinti:
+
+1. **Modalità penitenza diretta** — Il partecipante sceglie "Penitenza 😈" nella selezione modalità. Viene estratta una penitenza casuale e mostrata come flip-card. Il pulsante **Altra** propone una penitenza diversa; **Accetta 😈** la conferma, la segna come usata e torna alla ruota.
+
+2. **Penitenza intermedia** — Se le penitenze sono presenti, vengono proposte automaticamente come "imprevisto" prima di ogni canzone (sia in modalità singola che cinque carte) e prima di ogni set **Altre 5**. Una volta accettata la penitenza con **Penitenza effettuata ✅**, l'app procede normalmente con la selezione della canzone.
+
+Le penitenze già usate non vengono riproposte finché non si è esaurita la lista completa; a quel punto il ciclo riparte dall'inizio.
 
 ### Statistiche in tempo reale
 
@@ -89,7 +100,11 @@ Quando una canzone viene confermata (in qualsiasi modalità):
 3. Il titolo viene copiato automaticamente negli appunti (`clipboard.writeText`)
 4. La vista torna alla ruota, pronta per il turno successivo
 
-Il pulsante **Reset** ripristina lo stato di "usato" di tutti i partecipanti e tutte le canzoni, senza cancellarli — utile per ricominciare la serata con la stessa lista.
+Il pulsante **Reset** ripristina lo stato di "usato" di tutti i partecipanti, tutte le canzoni e tutte le penitenze, senza cancellarli — utile per ricominciare la serata con le stesse liste.
+
+### Persistenza con localStorage
+
+Lo stato dell'applicazione viene salvato automaticamente nel browser. Partecipanti, canzoni, penitenze e rispettivi stati di utilizzo sopravvivono alla chiusura e alla riapertura della pagina. Non è necessaria nessuna azione da parte dell'utente.
 
 ---
 
@@ -105,19 +120,24 @@ Il pulsante **Reset** ripristina lo stato di "usato" di tutti i partecipanti e t
    → CSV: clicca "Carica file CSV" e seleziona il file
    → Manuale: passa alla tab "Manuale" e inserisci i titoli uno per uno
 
-4. Gira la ruota
+4. (Opzionale) Aggiungi penitenze
+   → Scrivi la descrizione nel campo "Descrizione penitenza" e premi Aggiungi o Enter
+   → Se presenti, verranno proposte come imprevisto prima di ogni canzone
+
+5. Gira la ruota
    → Clicca "Gira la Ruota" — attendi la fine dell'animazione
 
-5. Seleziona la modalità canzone
+6. Seleziona la modalità
    → "Una canzone": flip-card singola, puoi chiedere un'altra prima di confermare
    → "Cinque carte": scegli tra 5 opzioni, clicca quella che vuoi
+   → "Penitenza 😈": estrai una penitenza diretta invece di una canzone
 
-6. Conferma la canzone
+7. Conferma la canzone o la penitenza
    → Il titolo viene copiato negli appunti automaticamente
 
-7. Ripeti dal punto 4 per ogni turno
+8. Ripeti dal punto 5 per ogni turno
 
-8. A fine serata, premi Reset per ricominciare con le stesse liste
+9. A fine serata, premi Reset per ricominciare con le stesse liste
 ```
 
 ---
@@ -149,13 +169,15 @@ karaoke-wheel/
 
 ## Architettura e stato applicativo
 
-Lo stato è gestito interamente in memoria tramite variabili globali in `script.js`. Non viene usato `localStorage` né alcun backend.
+Lo stato è gestito interamente in memoria tramite variabili globali in `script.js` e viene persistito automaticamente in `localStorage` ad ogni modifica.
 
 ```js
 let participants = []          // tutti i partecipanti aggiunti
 let usedParticipants = []      // estratti dalla ruota in questa sessione
 let songs = []                 // tutte le canzoni caricate
 let usedSongs = []             // canzoni già assegnate
+let penalties = []             // tutte le penitenze caricate
+let usedPenalties = []         // penitenze già estratte in questa sessione
 let currentParticipant = []    // il vincitore dell'ultimo spin
 let availableSongsForTurn = [] // canzoni disponibili per il turno corrente
 let shownSongsInTurn = []      // canzoni già mostrate nel turno (evita ripetizioni)
@@ -167,106 +189,19 @@ Le funzioni principali sono:
 |---|---|
 | `updateWheel()` | Ricalcola e ridisegna la ruota SVG |
 | `spinWheel()` | Calcola il vincitore, anima la rotazione |
-| `selectCardMode(mode)` | Smista tra modalità singola e cinque carte |
+| `selectCardMode(mode)` | Smista tra modalità singola, cinque carte e penitenza |
+| `withPenaltyInterrupt(callback)` | Mostra una penitenza intermedia prima di eseguire il callback |
 | `pickRandomSong()` | Estrae una canzone non ancora mostrata nel turno |
 | `createFiveCards()` | Genera 5 carte casuali e le inietta nel DOM |
 | `selectSong(songName)` | Conferma la canzone, aggiorna lo stato, copia negli appunti |
+| `showPenaltyCardMode()` | Gestisce la modalità penitenza diretta |
+| `selectPenalty(penaltyName)` | Conferma la penitenza, aggiorna lo stato, copia negli appunti |
 | `updateStats()` | Aggiorna i tre contatori visibili |
 | `renderParticipants()` | Ridisegna i tag partecipanti |
 | `renderSongList()` | Ridisegna la lista canzoni con stati usato/disponibile |
-
----
-
-## Implementazioni future
-
-### 1. Persistenza con localStorage
-
-Attualmente chiudendo il browser si perde tutto. Per salvare le liste tra una sessione e l'altra, creare due funzioni dedicate da integrare nel flusso esistente:
-
-```js
-function saveToStorage() {
-  localStorage.setItem('kw_participants', JSON.stringify(participants));
-  localStorage.setItem('kw_songs', JSON.stringify(songs));
-  localStorage.setItem('kw_usedParticipants', JSON.stringify(usedParticipants));
-  localStorage.setItem('kw_usedSongs', JSON.stringify(usedSongs));
-}
-
-function loadFromStorage() {
-  participants     = JSON.parse(localStorage.getItem('kw_participants') || '[]');
-  songs            = JSON.parse(localStorage.getItem('kw_songs') || '[]');
-  usedParticipants = JSON.parse(localStorage.getItem('kw_usedParticipants') || '[]');
-  usedSongs        = JSON.parse(localStorage.getItem('kw_usedSongs') || '[]');
-}
-```
-
-Chiamare `loadFromStorage()` all'avvio al posto delle chiamate init in fondo a `script.js`, e `saveToStorage()` alla fine di ogni funzione che modifica lo stato — ovvero `addNameBtn.onclick`, `removeSongByIndex`, `selectSong`, `resetBtn.onclick` e i due pulsanti "Elimina tutti".
-
----
-
-### 2. Musica durante lo spin e il giro delle carte
-
-Aggiungere in `index.html` due elementi audio nascosti, uno per la ruota e uno per le flip-card:
-
-```html
-<audio id="spinAudio" src="sounds/spin.mp3" preload="auto"></audio>
-<audio id="flipAudio" src="sounds/flip.mp3" preload="auto"></audio>
-```
-
-In `script.js`, avviare e fermare `spinAudio` dentro `spinWheel()`:
-
-```js
-function spinWheel() {
-  const spinAudio = document.getElementById('spinAudio');
-  spinAudio.currentTime = 0;
-  spinAudio.play();
-
-  function animate(time) {
-    // ...
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      spinAudio.pause();
-      spinAudio.currentTime = 0;
-      // resto del codice esistente
-    }
-  }
-  requestAnimationFrame(animate);
-}
-```
-
-Per il giro delle carte, aggiungere una funzione helper e richiamarla dentro `showCurrentSong()` (modalità singola) e `autoFlipCards()` (modalità cinque carte), subito prima che la classe `flipped` venga aggiunta alla carta:
-
-```js
-function playFlip() {
-  const audio = document.getElementById('flipAudio');
-  audio.currentTime = 0;
-  audio.play();
-}
-```
-
----
-
-### 3. Penitenze
-
-Aggiungere in `index.html` una sezione dedicata, strutturata come quella delle canzoni, con lista, input manuale e caricamento CSV. In `script.js` introdurre due array separati:
-
-```js
-let penalties = [];
-let usedPenalties = [];
-```
-
-La logica di estrazione è identica a quella delle canzoni — duplicare `pickRandomSong` e `selectSong` rinominandole `pickRandomPenalty` e `selectPenalty`, sostituendo i riferimenti a `songs`/`usedSongs` con `penalties`/`usedPenalties`.
-
-La penitenza va proposta come terza opzione nella schermata di selezione modalità, accanto a "Una canzone" e "Cinque carte":
-
-```html
-<button class="option-card" onclick="selectCardMode('penalty')">
-  <span class="option-icon">😈</span>
-  <span>Penitenza</span>
-</button>
-```
-
-In `selectCardMode()` aggiungere il caso `'penalty'`, che mostra una flip-card singola con il testo della penitenza estratta riutilizzando gli stessi elementi DOM della modalità singola (`singleCardSection`, `cardBack`) — senza creare nuovi elementi né nuovi stili.
+| `renderPenaltyList()` | Ridisegna la lista penitenze con stati usato/disponibile |
+| `saveToStorage()` | Serializza tutto lo stato in localStorage |
+| `loadFromStorage()` | Ripristina lo stato da localStorage all'avvio |
 
 ---
 
