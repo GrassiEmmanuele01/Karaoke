@@ -283,8 +283,8 @@ function updateWheel() {
     circle.setAttribute('cx', 200);
     circle.setAttribute('cy', 200);
     circle.setAttribute('r', 190);
-    circle.setAttribute('fill', '#fafafa');
-    circle.setAttribute('stroke', '#e5e5e5');
+    circle.setAttribute('fill', '#f4f3f0');
+    circle.setAttribute('stroke', 'rgba(0,0,0,0.08)');
     circle.setAttribute('stroke-width', '2');
     svg.appendChild(circle);
     
@@ -310,8 +310,8 @@ function createWheel(names) {
   const angleSlice = (Math.PI * 2) / numSlices;
   
   const colors = [
-    '#FFE5E5', '#E5FFE5', '#E5F0FF', '#FFFFE5', '#FFF0E5',
-    '#F0FFE5', '#FFFFF0', '#FFE5F0', '#F0E5FF', '#FFE5F5'
+    '#e8e2fd', '#d4eaff', '#d4f5ec', '#fde8d4', '#fdd4e8',
+    '#fff3d4', '#e2f0fd', '#ede2fd', '#d4f0e8', '#fde2e2'
   ];
   
   names.forEach((name, i) => {
@@ -328,7 +328,7 @@ function createWheel(names) {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', `M ${centerX} ${centerY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`);
     path.setAttribute('fill', colors[i % colors.length]);
-    path.setAttribute('stroke', 'white');
+    path.setAttribute('stroke', '#ffffff');
     path.setAttribute('stroke-width', '2');
     svg.appendChild(path);
 
@@ -345,7 +345,7 @@ function createWheel(names) {
     
     const fontSize = numSlices > 10 ? 11 : numSlices > 6 ? 13 : 14;
     text.setAttribute('font-size', fontSize);
-    text.setAttribute('fill', '#333');
+    text.setAttribute('fill', '#1c1a18');
     text.textContent = name.length > 12 ? name.substring(0, 12) + '...' : name;
     
     const rotation = (textAngle * 180 / Math.PI) + 90;
@@ -358,7 +358,7 @@ function createWheel(names) {
   centerCircle.setAttribute('cx', centerX);
   centerCircle.setAttribute('cy', centerY);
   centerCircle.setAttribute('r', 10);
-  centerCircle.setAttribute('fill', '#ddd');
+  centerCircle.setAttribute('fill', '#6041e8');
   svg.appendChild(centerCircle);
 }
 

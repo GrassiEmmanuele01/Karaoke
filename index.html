@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Karaoke Wheel</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="container">
+
     <header class="header">
-      <h1>🎤 Karaoke Wheel</h1>
+      <h1><span class="emoji">🎤</span> Karaoke Wheel</h1>
       <p class="subtitle">Gira la ruota e scegli la canzone</p>
     </header>
 
-    <!-- INPUT SECTION -->
+    <!-- PARTECIPANTI -->
     <section class="section">
       <h2>Partecipanti</h2>
       <div class="input-row">
@@ -24,10 +27,10 @@
       <button class="btn btn-text btn-danger" id="clearAllParticipantsBtn" style="display:none;">Elimina tutti</button>
     </section>
 
-    <!-- SONG SECTION -->
+    <!-- CANZONI -->
     <section class="section">
       <h2>Canzoni</h2>
-      
+
       <div class="tabs">
         <button class="tab active" id="csvModeBtn" onclick="setSongMode('csv')">CSV</button>
         <button class="tab" id="manualModeBtn" onclick="setSongMode('manual')">Manuale</button>
@@ -35,7 +38,8 @@
 
       <div id="csvModeSection">
         <label for="csvFile" class="file-upload">
-          <span>📁 Carica file CSV</span>
+          <span>📁</span>
+          <span>Carica file CSV</span>
         </label>
         <input type="file" id="csvFile" accept=".csv">
         <label class="checkbox">
@@ -50,7 +54,7 @@
           <button class="btn btn-primary" id="addSongBtn">Aggiungi</button>
         </div>
       </div>
-      
+
       <div class="song-list-box">
         <div class="list-header">
           <span>Canzoni caricate</span>
@@ -60,7 +64,7 @@
           <p class="empty">Nessuna canzone</p>
         </div>
       </div>
-      
+
       <button class="btn btn-text btn-danger" id="clearAllSongsBtn" style="display:none;">Elimina tutte</button>
     </section>
 
@@ -80,7 +84,7 @@
       </div>
     </div>
 
-    <!-- WHEEL -->
+    <!-- RUOTA -->
     <section class="section wheel-section">
       <div class="wheel-wrapper">
         <svg id="wheelSvg" viewBox="0 0 400 400"></svg>
@@ -93,7 +97,7 @@
       </div>
     </section>
 
-    <!-- CARD MODE -->
+    <!-- SCELTA MODALITÀ -->
     <section class="section" id="cardModeSelection" style="display: none;">
       <h2 id="cardModePlayer"></h2>
       <div class="mode-options">
@@ -108,7 +112,7 @@
       </div>
     </section>
 
-    <!-- SINGLE CARD -->
+    <!-- SINGOLA CARTA -->
     <section class="section" id="singleCardSection" style="display: none;">
       <h2 id="currentPlayerSingle"></h2>
       <div class="single-card-wrap">
@@ -120,13 +124,13 @@
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-secondary" id="nextSongBtn" style="display:none;">Altra</button>
+        <button class="btn btn-secondary" id="nextSongBtn" style="display:none;">Altra canzone</button>
         <button class="btn btn-success" id="selectSongBtn" style="display:none;">Seleziona</button>
         <button class="btn btn-outline" onclick="backToModeSelection()">Indietro</button>
       </div>
     </section>
 
-    <!-- FIVE CARDS -->
+    <!-- CINQUE CARTE -->
     <section class="section" id="fiveCardsSection" style="display: none;">
       <h2 id="currentPlayerFive"></h2>
       <div class="cards-row" id="cardsGrid"></div>
@@ -135,8 +139,9 @@
         <button class="btn btn-outline" onclick="backToModeSelection()">Indietro</button>
       </div>
     </section>
-  </div>
 
+  </div>
   <script src="script.js"></script>
 </body>
+
 </html>
