@@ -68,6 +68,28 @@
       <button class="btn btn-text btn-danger" id="clearAllSongsBtn" style="display:none;">Elimina tutte</button>
     </section>
 
+    <!-- PENITENZE -->
+    <section class="section">
+      <h2>Penitenze</h2>
+
+      <div class="input-row">
+        <input type="text" id="penaltyInput" placeholder="Descrizione penitenza" maxlength="80">
+        <button class="btn btn-primary" id="addPenaltyBtn">Aggiungi</button>
+      </div>
+
+      <div class="song-list-box">
+        <div class="list-header">
+          <span>Penitenze caricate</span>
+          <span class="count" id="penaltyCount">0</span>
+        </div>
+        <div class="song-list" id="penaltyList">
+          <p class="empty">Nessuna penitenza</p>
+        </div>
+      </div>
+
+      <button class="btn btn-text btn-danger" id="clearAllPenaltiesBtn" style="display:none;">Elimina tutte</button>
+    </section>
+
     <!-- STATS -->
     <div class="stats">
       <div class="stat">
@@ -109,10 +131,11 @@
           <span class="option-icon">🃏</span>
           <span>Cinque carte</span>
         </button>
+
       </div>
     </section>
 
-    <!-- SINGOLA CARTA -->
+    <!-- SINGOLA CARTA (canzoni e penitenze) -->
     <section class="section" id="singleCardSection" style="display: none;">
       <h2 id="currentPlayerSingle"></h2>
       <div class="single-card-wrap">
@@ -124,7 +147,7 @@
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-secondary" id="nextSongBtn" style="display:none;">Altra canzone</button>
+        <button class="btn btn-secondary" id="nextSongBtn" style="display:none;">Altra</button>
         <button class="btn btn-success" id="selectSongBtn" style="display:none;">Seleziona</button>
         <button class="btn btn-outline" onclick="backToModeSelection()">Indietro</button>
       </div>
